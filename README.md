@@ -33,14 +33,14 @@ Sure! do the following
 
 - clone the repo
 - edit the domains file and add/remove your domains
-- run `docker build . -t byosh:myown
-- run the command as before but from your own repo like so
+- run `docker build . -t byosh:myown`
+- run the command as before but from your own image tag:
 
 `docker run -d -p 53:53/udp -p 443:443 -p 80:80 --net=host -e PUB_IP=YOUR_PUBLIC_IP --name some-byosh byosh:myown`
 
 ## Can I have this for ALL domains not just a list
 
-Fairly easy to do, will update this repo with another ENV variable for that :) 
+Fairly easy to do, will update this repo with another ENV variable for that.
 
 ## What are the limitations
 
