@@ -40,7 +40,10 @@ Sure! do the following
 
 ## Can I have this for ALL domains not just a list
 
-Fairly easy to do, will update this repo with another ENV variable for that.
+run the following command (not tested):
+
+`docker run -d -p 53:53/udp -p 443:443 -p 80:80 --net=host -e PUB_IP=YOUR_PUBLIC_IP -e DNS_ALLOW_ALL=YES --name some-byosh mosajjal/byosh:latest`
+
 
 ## What are the limitations
 

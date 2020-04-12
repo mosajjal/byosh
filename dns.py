@@ -7,8 +7,8 @@ from os import environ
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process input')
-    parser.add_argument("--ip", help="set listen ip address, set to ENV to get it from PUB_IP ENV Variable", action="store", type=str, default="0.0.0.0")
-    parser.add_argument("--whitelist", help="Whitelisted Domain", action="store", type=str, default="Empty")
+    parser.add_argument("--ip", help="set listen ip address, set to ENV to get it from PUB_IP Env Variable", action="store", type=str, default="0.0.0.0")
+    parser.add_argument("--whitelist", help="Whitelisted Domain. use ALL or DNS_ALLOW_ALL=YES Env variable for access all domain", action="store", type=str, default="Empty")
     parser.add_argument("--port", help="set listen port", action="store", type=int, default=53)
     parser.add_argument("--debug", help="enable debug logging", action="store_true")
     args = parser.parse_args()
@@ -22,10 +22,14 @@ if __name__ == '__main__':
     udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_sock.bind(("0.0.0.0", args.port))
 
+
     w_list = []
-    if args.whitelist != "Empty":
-        with open(args.whitelist) as f:
-            w_list.extend(f.read().splitlines())
+    if environ.get("DNS_ALLOW_ALL") == "YES" or args.whitelist == "ALL":
+        allow_all = True
+    else:
+        if args.whitelist != "Empty":
+            with open(args.whitelist) as f:
+                w_list.extend(f.read().splitlines())
 
     try:
         while True:
@@ -34,7 +38,7 @@ if __name__ == '__main__':
             for question in d.questions:
                 qdom = question.get_qname()
                 r = d.reply()
-                if w_list != [] and (not any(s[1:] in str(qdom) for s in w_list)):
+                if (not allow_all) and (w_list != [] and (not any(s[1:] in str(qdom) for s in w_list))):
                     try:
                         realip = socket.gethostbyname(qdom.idna())
                     except Exception as e:
