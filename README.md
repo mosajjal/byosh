@@ -44,7 +44,9 @@ run the following command (not tested):
 
 `docker run -d -p 53:53/udp -p 443:443 -p 80:80 --net=host -e PUB_IP=YOUR_PUBLIC_IP -e DNS_ALLOW_ALL=YES --name some-byosh mosajjal/byosh:latest`
 
+NOTE: you still have to provide a list file, albiet an empty one. It'll get ignored once the service is started
 
-## What are the limitations
+## Limitation
 
-This Project is at Alpha stage so expect weird behaviour! I've turned off `ipv6` everywhere so that's a known limitation. Other than that, please let me know so I can fix it.
+This Project is at Alpha stage so expect weird behaviour! I've turned off `ipv6` everywhere so that's a known limitation. Other than that, the `dns.py` script is acting like a DNS server which is not a good practice for enterprise. Feel free to send PRs to make this better :)
+
