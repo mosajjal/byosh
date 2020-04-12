@@ -8,9 +8,9 @@ Since Security and Privacy audits have no place in Iran, and `Shekan` obviously 
 
 - Docker/podman(recommended)
 
-# Supported Domains
+# Proxied Domains
 
-- Included in `domains` file inside the repository
+- Included in `domains` file inside the repository. "borrowed" from [fod](https://github.com/freedomofdevelopers/fod)
 
 # How to Use
 
