@@ -1,8 +1,8 @@
-# Build Your Own Shekan
+# Build Your Own Shecan
 
-`Shekan` is an anti-sanction service offered by a group of researchers in Iran. It allows you to use a different DNS server and have a transparent proxy for the whitelisted domains. 
+`Shecan` is an anti-sanction service offered by a group of researchers in Iran. It allows you to use a different DNS server and have a transparent proxy for the whitelisted domains. 
 
-Since Security and Privacy audits have no place in Iran, and `Shekan` obviously hasn't been through proper vetting, I decided to re-engineer something similar to it for personal use.
+Since Security and Privacy audits have no place in Iran, and `Shecan` obviously hasn't been through proper vetting, I decided to re-engineer something similar to it for personal use.
 
 # Requirements
 
