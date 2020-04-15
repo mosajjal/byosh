@@ -22,7 +22,7 @@ if __name__ == '__main__':
     udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_sock.bind(("0.0.0.0", args.port))
 
-
+    allow_all = False
     w_list = []
     if environ.get("DNS_ALLOW_ALL") == "YES" or args.whitelist == "ALL":
         allow_all = True
