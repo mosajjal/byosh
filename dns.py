@@ -2,7 +2,7 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 
 import sys, socket, argparse
-from dnslib import DNSRecord, DNSHeader, RR, A, QTYPE
+from dnslib import DNSRecord, DNSHeader, RR, A, QTYPE, DNSError
 from os import environ
 
 if __name__ == '__main__':
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.debug:
-        print('IP: %s Port: %s withInternet: %s' % (args.ip, args.port, args.withInternet))
+        print('IP: %s Port: %s' % (args.ip, args.port))
     
     if str(args.ip).upper() == "ENV":
         args.ip = environ.get("PUB_IP")
@@ -34,25 +34,29 @@ if __name__ == '__main__':
     try:
         while True:
             data, addr = udp_sock.recvfrom(1024)
-            d = DNSRecord.parse(data)
-            for question in d.questions:
-                qdom = question.get_qname()
-                r = d.reply()
-                if (not allow_all) and (w_list != [] and (not any(s[1:] in str(qdom) for s in w_list))):
-                    try:
-                        realip = socket.gethostbyname(qdom.idna())
-                    except Exception as e:
+            try:
+                d = DNSRecord.parse(data)
+                for question in d.questions:
+                    qdom = question.get_qname()
+                    r = d.reply()
+                    if (not allow_all) and (w_list != [] and (not any(s[1:] in str(qdom) for s in w_list))):
+                        try:
+                            realip = socket.gethostbyname(qdom.idna())
+                        except Exception as e:
+                            if args.debug:
+                                print(e)
+                            realip = args.ip
+                        r.add_answer(RR(qdom,rdata=A(realip),ttl=60))
                         if args.debug:
-                            print(e)
-                        realip = args.ip
-                    r.add_answer(RR(qdom,rdata=A(realip),ttl=60))
-                    if args.debug:
-                        print("Request: %s --> %s" % (qdom.idna(), realip))
-                else:
-                    r.add_answer(RR(qdom,rdata=A(args.ip),ttl=60))
-                    if args.debug:
-                        print("Request: %s --> %s" % (qdom.idna(), args.ip))
-                udp_sock.sendto(r.pack(), addr)
+                            print("Request: %s --> %s" % (qdom.idna(), realip))
+                    else:
+                        r.add_answer(RR(qdom,rdata=A(args.ip),ttl=60))
+                        if args.debug:
+                            print("Request: %s --> %s" % (qdom.idna(), args.ip))
+                    udp_sock.sendto(r.pack(), addr)
+            except DNSError as err:
+                if args.debug:
+                    print(err)
     except KeyboardInterrupt:
         if args.debug:
             print("done.")
