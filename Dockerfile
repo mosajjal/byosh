@@ -11,4 +11,6 @@ COPY dns.py /opt/dns.py
 COPY domains /opt/domains
 COPY entrypoint.sh /entrypoint.sh
 
+RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["./entrypoint.sh"]
