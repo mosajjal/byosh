@@ -1,6 +1,6 @@
 # Build Your Own Shecan
 
-IMPORTANT NOTE: [sniproxy](https://github.com/mosajjal/sniproxy) is `byosh`'s eventual successor, which will offer a simpler architecture with better performance.
+IMPORTANT NOTE: [sniproxy](https://github.com/mosajjal/sniproxy) is `byosh`'s eventual successor, which will offer a simpler architecture with better performance. Eventually byosh will be archived. 
 
 `Shecan` is an anti-sanction service offered by a group of researchers in Iran. It allows you to use a different DNS server and have a transparent proxy for the whitelisted domains. 
 
