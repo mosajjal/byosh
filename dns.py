@@ -7,6 +7,7 @@ from socketserver import ThreadingUDPServer, DatagramRequestHandler
 
 allow_all = False
 w_list = []
+args = None
 
 
 class PacketHandler(DatagramRequestHandler):  # DatagramRequestHandler
@@ -15,25 +16,27 @@ class PacketHandler(DatagramRequestHandler):  # DatagramRequestHandler
         if args.debug:  # Show Client Address (if debug)
             print("Accept Request from : ", self.client_address[0])
         try:
-            packet = DNSRecord.parse(data) # Parse DNS Packet
-            for question in packet.questions: # Iterate over questions ( however most of DNS Servers even BIND support single question)
-                requested_domain_name = question.get_qname() # Get the requested name
-                reply_packet = packet.reply() # Generate Reply packet
-                if (not allow_all) and (w_list != [] and (not any(s[1:] in str(requested_domain_name) for s in w_list))): # Check the Whitelist
+            packet = DNSRecord.parse(data)  # Parse DNS Packet
+            for question in packet.questions:  # Iterate over questions ( however most of DNS Servers even BIND support single question)
+                requested_domain_name = question.get_qname()  # Get the requested name
+                reply_packet = packet.reply()  # Generate Reply packet
+                if (not allow_all) and (w_list != [] and (
+                not any(s[1:] in str(requested_domain_name) for s in w_list))):  # Check the Whitelist
                     try:
-                        realip = socket.gethostbyname(requested_domain_name.idna()) # Get Real IP Address
+                        realip = socket.gethostbyname(requested_domain_name.idna())  # Get Real IP Address
                     except Exception as e:
                         if args.debug:
                             print(e)
                         realip = args.ip
-                    reply_packet.add_answer(RR(requested_domain_name, rdata=A(realip), ttl=60)) # Append Address to replies
+                    reply_packet.add_answer(
+                        RR(requested_domain_name, rdata=A(realip), ttl=60))  # Append Address to replies
                     if args.debug:
                         print("Request: %s --> %s" % (requested_domain_name.idna(), realip))
                 else:
-                    reply_packet.add_answer(RR(requested_domain_name, rdata=A(args.ip), ttl=60)) # Fake the address
+                    reply_packet.add_answer(RR(requested_domain_name, rdata=A(args.ip), ttl=60))  # Fake the address
                     if args.debug:
                         print("Request: %s --> %s" % (requested_domain_name.idna(), args.ip))
-                self.wfile.write(reply_packet.pack()) # send Packed UDP Response to the client
+                self.wfile.write(reply_packet.pack())  # send Packed UDP Response to the client
         except DNSError as err:
             if args.debug:
                 print(err)
