@@ -49,7 +49,7 @@ if __name__ == '__main__':
     parser.add_argument("--whitelist",
                         help="Whitelisted Domain. use ALL or DNS_ALLOW_ALL=YES Env variable for access all domain",
                         action="store", type=str, default="Empty")
-    parser.add_argument("--port", help="set listen port", action="store", type=int, default=10530)
+    parser.add_argument("--port", help="set listen port", action="store", type=int, default=53)
     parser.add_argument("--debug", help="enable debug logging", action="store_true")
     args = parser.parse_args()
 
