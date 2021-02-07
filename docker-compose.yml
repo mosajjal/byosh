@@ -1,0 +1,13 @@
+version : '3'
+services:
+  byosh:
+    env_file: .env
+    network_mode: host
+    build:
+      dockerfile : Dockerfile
+      context : .
+    restart: always
+    ulimits:
+      nofile:
+        soft: 1024000
+        hard: 1024000
