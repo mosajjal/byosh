@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 expandtab
-import sys, socket, argparse
-from dnslib import DNSRecord, DNSHeader, RR, A, QTYPE, DNSError
+import socket
+import argparse
+
 from os import environ
+from dnslib import DNSRecord, RR, A, DNSError
 from socketserver import ThreadingUDPServer, DatagramRequestHandler
 
-allow_all = False
-w_list = []
-args = None
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Process input')
+    parser.add_argument("--ip", help="set listen ip address, set to ENV to get it from PUB_IP Env Variable", action="store", type=str, default="0.0.0.0")
+    parser.add_argument("--port", help="set listen port", action="store", type=int, default=53)
+    parser.add_argument("--whitelist", help="Whitelisted Domain. use ALL or DNS_ALLOW_ALL=YES Env variable for access all domain", action="store", type=str, default="Empty")
+    parser.add_argument("--debug", help="enable debug logging", action="store_true")
+    return parser.parse_args()
 
 
 class PacketHandler(DatagramRequestHandler):  # DatagramRequestHandler
@@ -23,15 +30,15 @@ class PacketHandler(DatagramRequestHandler):  # DatagramRequestHandler
                 if (not allow_all) and (w_list != [] and (
                 not any(s[1:] in str(requested_domain_name) for s in w_list))):  # Check the Whitelist
                     try:
-                        realip = socket.gethostbyname(requested_domain_name.idna())  # Get Real IP Address
+                        real_ip = socket.gethostbyname(requested_domain_name.idna())  # Get Real IP Address
                     except Exception as e:
                         if args.debug:
                             print(e)
-                        realip = args.ip
+                        real_ip = args.ip
                     reply_packet.add_answer(
-                        RR(requested_domain_name, rdata=A(realip), ttl=60))  # Append Address to replies
+                        RR(requested_domain_name, rdata=A(real_ip), ttl=60))  # Append Address to replies
                     if args.debug:
-                        print("Request: %s --> %s" % (requested_domain_name.idna(), realip))
+                        print("Request: %s --> %s" % (requested_domain_name.idna(), real_ip))
                 else:
                     reply_packet.add_answer(RR(requested_domain_name, rdata=A(args.ip), ttl=60))  # Fake the address
                     if args.debug:
@@ -43,16 +50,9 @@ class PacketHandler(DatagramRequestHandler):  # DatagramRequestHandler
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Process input')
-    parser.add_argument("--ip", help="set listen ip address, set to ENV to get it from PUB_IP Env Variable",
-                        action="store", type=str, default="0.0.0.0")
-    parser.add_argument("--whitelist",
-                        help="Whitelisted Domain. use ALL or DNS_ALLOW_ALL=YES Env variable for access all domain",
-                        action="store", type=str, default="Empty")
-
-    parser.add_argument("--port", help="set listen port", action="store", type=int, default=53)
-    parser.add_argument("--debug", help="enable debug logging", action="store_true")
-    args = parser.parse_args()
+    w_list = []
+    allow_all = False
+    args = parse_args()
 
     if str(args.ip).upper() == "ENV":
         args.ip = environ.get("PUB_IP")
